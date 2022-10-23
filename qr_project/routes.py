@@ -1,6 +1,6 @@
 from qr_project import app
 from flask import render_template, request, redirect
-import database
+from qr_project import db, User
 
 
 @app.route('/')
@@ -14,17 +14,22 @@ def registration():
     if request.method == 'GET':
         return render_template('registration.html')
     else:
-        username = request.form.get('username')
-        email = request.form.get('email')
-        password = request.form.get('password')
+        user = User(username=request.form.get('username'),
+                    email=request.form.get('email'),
+                    password=request.form.get('password'))
 
-        database.register_user(username, email, password)
+        db.session.add(user)
+        db.session.commit()
 
-        return redirect('/')
+        return redirect('/login')
 
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+
     return render_template('login.html')
 
 
