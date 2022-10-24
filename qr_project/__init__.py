@@ -18,4 +18,16 @@ class User(db.Model):
     def __repr__(self):
         return f'User: {self.id}'
 
+    def __init__(self, username, email, password):
+        self.username = username
+        self.email = email
+        self.password = password
+
+    @staticmethod
+    def get_user(email):
+        data = db.session.query(User).filter_by(email=email).all()
+        return data
+
+
+
 from qr_project import routes

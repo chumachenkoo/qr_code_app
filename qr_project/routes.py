@@ -1,5 +1,5 @@
 from qr_project import app
-from flask import render_template, request, redirect
+from flask import render_template, request, redirect, session
 from qr_project import db, User
 
 
@@ -27,8 +27,14 @@ def registration():
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
+        user_email = request.form['email']
+        user_password = request.form['password']
+
+        user = User.get_user(email=user_email)
+
+        if user is not None and user_password == user[0].password:
+            session['id'] = user[0].id
+            return render_template('index.html')
 
     return render_template('login.html')
 
