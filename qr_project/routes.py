@@ -1,5 +1,5 @@
 from qr_project import app
-from flask import render_template, request, redirect, session
+from flask import render_template, request, redirect, session, url_for
 from qr_project import db, User
 
 
@@ -21,11 +21,11 @@ def registration():
         db.session.add(user)
         db.session.commit()
 
-        return redirect('/login')
+        return redirect(url_for('get_login'))
 
 
-@app.route('/login', methods=['POST', 'GET'])
-def login():
+@app.route('/login', methods=['POST'])
+def post_login():
     if request.method == 'POST':
         user_email = request.form['email']
         user_password = request.form['password']
@@ -34,9 +34,23 @@ def login():
 
         if user is not None and user_password == user[0].password:
             session['id'] = user[0].id
-            return render_template('index.html')
+            return redirect(url_for('index'))
 
-    return render_template('login.html')
+        return redirect(url_for('get_login'))
+
+
+@app.route('/login', methods=['GET'])
+def get_login():
+    if 'id' in session:
+        return redirect(url_for('user_account'))
+    else:
+        return render_template('login.html')
+
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for("get_login"))
 
 
 @app.route('/account')
@@ -45,5 +59,5 @@ def user_account():
 
 
 @app.route('/generator')
-def account():
+def generator():
     return render_template('generator.html')
