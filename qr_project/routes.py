@@ -58,7 +58,6 @@ def user_account():
     if 'email' in session:
         user_email = session.get('email')
         user_data = User.get_user(email=user_email)
-        print(user_data)
         return render_template('account.html', user=user_data)
 
     return redirect(url_for('get_login'))
