@@ -1,1 +1,41 @@
 {% extends "base.html" %}
+
+{% block body %}
+
+<style>
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+</style>
+<body>
+
+<h2>User Account</h2>
+
+<table>
+  <tr>
+      <th>User Name:</th>
+      <th>User Email</th>
+      <th>User QRs</th>
+  </tr>
+
+  <tr>
+      <td>{{ user[0].username }}</td>
+      <td>{{ user[0].email }}</td>
+      <td>Coming Soon</td>
+  </tr>
+
+</table>
+
+{% endblock %}

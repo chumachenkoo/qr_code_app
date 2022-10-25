@@ -33,7 +33,7 @@ def post_login():
         user = User.get_user(email=user_email)
 
         if user is not None and user_password == user[0].password:
-            session['id'] = user[0].id
+            session['email'] = user[0].email
             return redirect(url_for('index'))
 
         return redirect(url_for('get_login'))
@@ -41,7 +41,7 @@ def post_login():
 
 @app.route('/login', methods=['GET'])
 def get_login():
-    if 'id' in session:
+    if 'email' in session:
         return redirect(url_for('user_account'))
     else:
         return render_template('login.html')
@@ -55,7 +55,13 @@ def logout():
 
 @app.route('/account')
 def user_account():
-    return render_template('account.html')
+    if 'email' in session:
+        user_email = session.get('email')
+        user_data = User.get_user(email=user_email)
+        print(user_data)
+        return render_template('account.html', user=user_data)
+
+    return redirect(url_for('get_login'))
 
 
 @app.route('/generator')
