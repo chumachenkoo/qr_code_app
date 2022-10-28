@@ -1,6 +1,9 @@
 from qr_project import app
 from flask import render_template, request, redirect, session, url_for
-from qr_project import db, User
+from qr_project import db, User, QRcode
+import qrcode
+from io import BytesIO
+import base64
 
 
 @app.route('/')
@@ -30,10 +33,10 @@ def post_login():
         user_email = request.form['email']
         user_password = request.form['password']
 
-        user = User.get_user(email=user_email)
+        user = User.get_user_by_mail(user_email)
 
         if user is not None and user_password == user[0].password:
-            session['email'] = user[0].email
+            session['id'] = user[0].id
             return redirect(url_for('index'))
 
         return redirect(url_for('get_login'))
@@ -41,7 +44,7 @@ def post_login():
 
 @app.route('/login', methods=['GET'])
 def get_login():
-    if 'email' in session:
+    if 'id' in session:
         return redirect(url_for('user_account'))
     else:
         return render_template('login.html')
@@ -55,14 +58,34 @@ def logout():
 
 @app.route('/account')
 def user_account():
-    if 'email' in session:
-        user_email = session.get('email')
-        user_data = User.get_user(email=user_email)
+    if 'id' in session:
+        user_id = session.get('id')
+        user_data = User.get_user_by_id(user_id)
         return render_template('account.html', user=user_data)
 
     return redirect(url_for('get_login'))
 
 
-@app.route('/generator')
-def generator():
-    return render_template('generator.html')
+@app.route('/generator', methods=['POST', 'GET'])
+def qr_generator():
+    if 'id' in session:
+        if request.method == 'POST':
+            data = request.form['qr_code']
+            image = qrcode.make(data)
+            buffer = BytesIO()
+            image.save(buffer, format='png')
+
+            inf = base64.b64encode(buffer.getvalue())
+
+            qr = QRcode(qr_code=inf, owner=session.get('id'))
+
+            db.session.add(qr)
+            db.session.commit()
+
+            return render_template('index.html', qr_code=f'data:image/png;base64,{inf.decode("UTF-8")}')
+        else:
+            return render_template('generator.html')
+    return redirect(url_for('get_login'))
+
+
+
