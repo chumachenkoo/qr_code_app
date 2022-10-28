@@ -3,3 +3,6 @@ bin
 lib
 pyvenv.cfg
 .idea
+share
+__pycache__
+.DS_Store
