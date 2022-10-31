@@ -2,42 +2,30 @@
 
 {% block body %}
 
-<style>
-table {
-  font-family: arial, sans-serif;
-  border-collapse: collapse;
-  width: 100%;
-}
+<main>
 
-td, th {
-  border: 1px solid #dddddd;
-  text-align: left;
-  padding: 8px;
-}
+  <section class="py-5 text-center container">
+    <div class="row py-lg-5">
+      <div class="col-lg-6 col-md-8 mx-auto">
+        <h1 class="fw-light">User: {{ user[0].username }}</h1>
+        <p class="lead text-muted">All your qr codes are displayed here.</p>
+      </div>
+    </div>
+  </section>
 
-tr:nth-child(even) {
-  background-color: #dddddd;
-}
-</style>
-<body>
+  <div class="album py-5 bg-light">
+    <div class="container">
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
 
-<h2>User Account</h2>
+        {% for code in qr_codes %}
+        <div class="col">
+          <div class="card shadow-sm">
+              <img src="{{ code }}" alt="User Images">
+          </div>
+        </div>
+        {% endfor %}
 
-<table>
-  <tr>
-      <th>User Name:</th>
-      <th>User Email:</th>
-  </tr>
 
-  <tr>
-     <td>{{ user[0].username }}</td>
-     <td>{{ user[0].email }}</td>
-  </tr>
-
-</table>
-
-{% for code in qr_codes %}
-    <img src="{{ code }}" alt="User Images">
-{% endfor %}
+</main>
 
 {% endblock %}

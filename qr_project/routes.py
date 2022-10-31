@@ -3,17 +3,9 @@ from flask import render_template, request, redirect, session, url_for
 from qr_project import db, User, QRcode
 
 
-@app.route('/')
-@app.route('/home')
-def index():
-    return render_template('index.html')
-
-
 @app.route('/registration', methods=['POST', 'GET'])
 def registration():
-    if request.method == 'GET':
-        return render_template('registration.html')
-    else:
+    if request.method == "POST":
         user = User(username=request.form.get('username'),
                     email=request.form.get('email'),
                     password=request.form.get('password'))
@@ -21,9 +13,13 @@ def registration():
         db.session.add(user)
         db.session.commit()
 
-        return redirect(url_for('get_login'))
+    elif request.method == "GET" and 'id' not in session:
+        return render_template('registration.html')
+    else:
+        return redirect(url_for('user_account'))
 
 
+@app.route('/', methods=['POST'])
 @app.route('/login', methods=['POST'])
 def post_login():
     if request.method == 'POST':
@@ -34,11 +30,12 @@ def post_login():
 
         if user is not None and user_password == user[0].password:
             session['id'] = user[0].id
-            return redirect(url_for('index'))
+            return redirect(url_for('user_account'))
 
         return redirect(url_for('get_login'))
 
 
+@app.route('/', methods=['GET'])
 @app.route('/login', methods=['GET'])
 def get_login():
     if 'id' in session:
@@ -75,7 +72,7 @@ def qr_generator():
             db.session.add(qr)
             db.session.commit()
 
-            return render_template('index.html')
+            return redirect(url_for('user_account'))
         else:
             return render_template('generator.html')
     return redirect(url_for('get_login'))
