@@ -26,16 +26,18 @@ tr:nth-child(even) {
 <table>
   <tr>
       <th>User Name:</th>
-      <th>User Email</th>
-      <th>User QRs</th>
+      <th>User Email:</th>
   </tr>
 
   <tr>
      <td>{{ user[0].username }}</td>
      <td>{{ user[0].email }}</td>
-     <td>{{ user[0].qr_codes }}</td>
   </tr>
 
 </table>
+
+{% for code in qr_codes %}
+    <img src="{{ code }}" alt="User Images">
+{% endfor %}
 
 {% endblock %}

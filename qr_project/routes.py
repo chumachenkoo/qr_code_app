@@ -61,7 +61,8 @@ def user_account():
     if 'id' in session:
         user_id = session.get('id')
         user_data = User.get_user_by_id(user_id)
-        return render_template('account.html', user=user_data)
+        qr = QRcode.decode(user_data)
+        return render_template('account.html', user=user_data, qr_codes=qr)
 
     return redirect(url_for('get_login'))
 
@@ -71,18 +72,13 @@ def qr_generator():
     if 'id' in session:
         if request.method == 'POST':
             data = request.form['qr_code']
-            image = qrcode.make(data)
-            buffer = BytesIO()
-            image.save(buffer, format='png')
-
-            inf = base64.b64encode(buffer.getvalue())
-
-            qr = QRcode(qr_code=inf, owner=session.get('id'))
+            user = session.get('id')
+            qr = QRcode.generate(data, user)
 
             db.session.add(qr)
             db.session.commit()
 
-            return render_template('index.html', qr_code=f'data:image/png;base64,{inf.decode("UTF-8")}')
+            return render_template('index.html')
         else:
             return render_template('generator.html')
     return redirect(url_for('get_login'))

@@ -1,5 +1,8 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+import qrcode
+from io import BytesIO
+import base64
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///qr_project1.db'
@@ -40,6 +43,26 @@ class QRcode(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     qr_code = db.Column(db.LargeBinary, nullable=True)
     owner = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    @staticmethod
+    def generate(data, user):
+        image = qrcode.make(data)
+        buffer = BytesIO()
+        image.save(buffer, format='png')
+
+        inf = base64.b64encode(buffer.getvalue())
+
+        qr = QRcode(qr_code=inf, owner=user)
+        return qr
+
+    @staticmethod
+    def decode(user_data):
+        result = []
+        for data in user_data[0].qr_codes:
+            qr = data.qr_code
+            info = f'data:image/png;base64,{qr.decode("UTF-8")}'
+            result.append(info)
+        return result
 
 
 from qr_project import routes
