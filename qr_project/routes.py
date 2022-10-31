@@ -1,9 +1,6 @@
 from qr_project import app
 from flask import render_template, request, redirect, session, url_for
 from qr_project import db, User, QRcode
-import qrcode
-from io import BytesIO
-import base64
 
 
 @app.route('/')
