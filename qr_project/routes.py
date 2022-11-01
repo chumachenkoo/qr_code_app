@@ -1,21 +1,30 @@
 from qr_project import app
-from flask import render_template, request, redirect, session, url_for
+from flask import render_template, request, redirect, session, url_for, flash
 from qr_project import db, User, QRcode
 
 
-@app.route('/registration', methods=['POST', 'GET'])
-def registration():
+@app.route('/registration', methods=['GET'])
+def get_registration():
+    if 'id' in session:
+        return redirect(url_for('user_account'))
+
+    return render_template('registration.html')
+
+
+@app.route('/registration', methods=['POST'])
+def post_registration():
     if request.method == "POST":
         user = User(username=request.form.get('username'),
                     email=request.form.get('email'),
                     password=request.form.get('password'))
 
+        if User.get_user_by_mail(user.email):
+            flash('User has been already registered!')
+            return render_template('registration.html')
+
         db.session.add(user)
         db.session.commit()
 
-    elif request.method == "GET" and 'id' not in session:
-        return render_template('registration.html')
-    else:
         return redirect(url_for('user_account'))
 
 
