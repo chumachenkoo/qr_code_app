@@ -1,0 +1,1 @@
+QRCode app developed with flask, sqlite, qrcode and pillow libraries, used bootstrap for frontend part
